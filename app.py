@@ -114,38 +114,11 @@ def PreviousHistory(State:State):
 
 
 
-def Summary(State:State):
-    query = State['query']
-    stage1:State['']
-    stage2:State['stage2']
-    stage3:State['stage3']
-    stage4:State['stage4']
-    stage5:State['stage5']
-
-
-    prompt = f"""
-    Thsi is the query and this is the data from 5 stages of RAG, give me the final Analysis,
-    stage1:{stage1}
-    stage2:{stage2}
-    stage3:{stage3}
-    stage4:{stage4}
-    stage5:{stage5}
-    """
-    result = model.invoke(prompt)
-    final = result.content[0]['text']
-    State['summary']= final
-    return {
-        'summary':final
-    }
 
 graph = StateGraph(State)
 
 graph.add_node('codes', Codes)
 graph.add_node('history',PreviousHistory)
-graph.add_node('stage3', Stage3)
-graph.add_node('stage4', Stage4)
-graph.add_node('stage5', Stage5)
-graph.add_node('summary', Summary)
 
 
 graph.add_edge(START, 'codes')
