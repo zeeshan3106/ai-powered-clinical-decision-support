@@ -8,8 +8,22 @@ from dotenv import load_dotenv
 from typing import TypedDict, Literal
 import json
 import os
+from fastapi.middleware.cors import CORSMiddleware
+from langgraph.config import get_stream_writer
+import time
 load_dotenv()
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 model = ChatGoogleGenerativeAI(model = "gemini-3.5-flash-lite")
 embedding = GoogleGenerativeAIEmbeddings(model = "gemini-embedding-001")
 API = os.getenv('API')
@@ -81,6 +95,7 @@ def Codes(State:State):
 
 
 def PreviousHistory(State:State):
+    writer = get_stream_writer()
     codes = State['codes']
     query = State['query']
 
@@ -102,13 +117,37 @@ def PreviousHistory(State:State):
     Analyze the retrieved information and provide
     a response based on the available records.
     """
-    result = model.invoke(prompt)
-    final = result.content[0]['text']
-    State['history']=final
+    # result = model.invoke(prompt)
+    # final = result.content[0]['text']
+    # State['history']=final
 
+
+    answer = []
+
+    for chunk in model.stream(prompt):
+        if isinstance(chunk.content, str):
+            text = chunk.content
+        else:
+            text = "".join(
+                block.get("text", "")
+                for block in chunk.content
+                if block.get("type") == "text"
+            )
+
+        if text:
+            answer.append(text)
+
+            for word in text.split(" "):
+                writer(word + " ")
+                time.sleep(0.03)
+
+        final_answer = "".join(answer)
     return {
-        'history':final
-    }
+    "history": final_answer
+}
+
+
+
 
 
 
@@ -133,6 +172,18 @@ config = {'configurable':{'thread_id':1}}
 def ClinicGet(query:str = Body(...)):
     workflow = graph.compile()
     initial_state = {'query':query}
-    final = workflow.invoke(initial_state)
+    # final = workflow.invoke(initial_state)
     
-    return JSONResponse(status_code=200, content = final['history'])
+    return StreamingResponse(
+        (
+            chunk
+            for chunk in workflow.stream(
+                initial_state,
+        
+                stream_mode='custom'
+            )
+
+            if isinstance(chunk, str)
+        ),
+        media_type='text/plain'
+    )
