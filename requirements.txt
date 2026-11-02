@@ -7,5 +7,5 @@ langchain_google_genai
 python_dotenv
 uvicorn[standard]
 requests
-streamlit
+
 
