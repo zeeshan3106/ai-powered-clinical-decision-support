@@ -212,13 +212,12 @@ graph.add_edge('history',END)
 # graph.add_edge('stage5', END)
 # graph.add_edge('summary', END)
 
-connect = sqlite3.connect(database = "abc.db", check_same_thread=False)
-checkpointer = SqliteSaver(connect)
+
 config = {'configurable':{'thread_id':1}}
 @app.post('/get')
 def ClinicGet(query:str = Body(...)):
-    workflow = graph.compile(checkpointer=checkpointer)
+    workflow = graph.compile()
     initial_state = {'query':query}
-    final = workflow.invoke(initial_state, config = config)
+    final = workflow.invoke(initial_state)
     
     return JSONResponse(status_code=200, content = final['history'])
