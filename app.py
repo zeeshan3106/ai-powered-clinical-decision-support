@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from typing import TypedDict, Literal
 import json
 import os
-import sqlite3
 load_dotenv()
 app = FastAPI()
 model = ChatGoogleGenerativeAI(model = "gemini-3.5-flash-lite")
