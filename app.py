@@ -1,6 +1,5 @@
 from langgraph.graph import StateGraph, START, END
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langgraph.checkpoint.sqlite import SqliteSaver
 from pymongo import MongoClient
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from fastapi import FastAPI,Body
