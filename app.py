@@ -114,62 +114,6 @@ def PreviousHistory(State:State):
 
 
 
-
-def Stage3(State:State):
-    query = State['query']
-    rag = db.as_retriever(
-        search_kwargs={
-            'k':20
-        }
-    )
-    raged = rag.invoke(query)
-    prompt = f"""
-    This is the query regarding the patient{query} Analyze the data from this RAG{raged} and give response to the query of individual
-    """
-    result = model.invoke(prompt)
-    final = result.content[0]['text']
-
-    return {
-        'stage1':final
-    }
-
-
-def Stage4(State:State):
-    query = State['query']
-    rag = db.as_retriever(
-        search_kwargs={
-            'k':20
-        }
-    )
-    raged = rag.invoke(query)
-    prompt = f"""
-    This is the query regarding the patient{query} Analyze the data from this RAG{raged} and give response to the query of individual
-    """
-    result = model.invoke(prompt)
-    final = result.content[0]['text']
-
-    return {
-        'stage1':final
-    }
-
-def Stage5(State:State):
-    query = State['query']
-    rag = db.as_retriever(
-        search_kwargs={
-            'k':20
-        }
-    )
-    raged = rag.invoke(query)
-    prompt = f"""
-    This is the query regarding the patient{query} Analyze the data from this RAG{raged} and give response to the query of individual
-    """
-    result = model.invoke(prompt)
-    final = result.content[0]['text']
-
-    return {
-        'stage1':final
-    }
-
 def Summary(State:State):
     query = State['query']
     stage1:State['']
